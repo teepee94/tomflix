@@ -1,72 +1,62 @@
-This is a react app using the movie database api https://www.themoviedb.org/?language=en-GB
+# Tomflix
 
-# Getting Started with Create React App
+A Netflix-style streaming homepage built with React, using live data from [The Movie Database (TMDB) API](https://www.themoviedb.org/).
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Built by [Tommy Parkinson](https://tommyparkinson.com) as a front-end showcase.
 
-## Available Scripts
+## Tech stack
 
-In the project directory, you can run:
+- **React 18** with function components and hooks, in `StrictMode`
+- **React Router 7** for routing
+- **Axios** for a shared, pre-configured TMDB client
+- **GSAP + ScrollTrigger** for the masthead parallax and scroll-in effects
+- **SCSS** in an ITCSS structure (settings → tools → generic → elements → components) with BEM class naming
+- **Jest + React Testing Library** for tests
 
-### `npm start`
+## Getting started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Get a free v3 API key from [TMDB](https://www.themoviedb.org/settings/api).
+2. Copy the example env file and add your key:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   ```bash
+   cp .env.example .env
+   ```
 
-### `npm test`
+3. Install and run:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   npm install
+   npm start
+   ```
 
-### `npm run build`
+   The app runs at http://localhost:3000.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Script          | What it does                         |
+| --------------- | ------------------------------------ |
+| `npm start`     | Start the dev server                 |
+| `npm test`      | Run tests in watch mode              |
+| `npm run build` | Create a production build in `build/` |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Notable decisions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **`useTmdb` hook** (`src/hooks/useTmdb.js`). All data fetching goes through one hook that returns `{ data, loading, error }`. A module-level cache shares in-flight requests, so components asking for the same endpoint (the masthead and the "Netflix Originals" row) make one network call. Results are reused on remount. The effect ignores stale responses on cleanup, so it's safe under StrictMode's double-invoke in development.
+- **Image sizing.** TMDB's sized renditions (`w342`, `w780`, `w1280`) are used instead of `original`, with native `loading="lazy"` for rows below the fold.
+- **Animation cleanup.** GSAP tweens and ScrollTriggers are created per component (`gsap.context` / per-item triggers) and torn down on unmount.
+- **API key.** The key lives in `.env` (gitignored) as `REACT_APP_TMDB_KEY`. In a client-only app the key is still visible in browser network requests. Hiding it fully would need a small server-side proxy.
 
-### `npm run eject`
+## Project structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+src/
+  hooks/                 useTmdb data-fetching hook
+  html/components/       Navbar, Masthead, Listing, ListingItem, Footer
+  html/pages/templates/  Page templates
+  resources/js/TMDB/     Axios client, endpoint paths, image/title helpers
+  resources/sass/        ITCSS SCSS
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Notes
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+`npm audit` reports advisories in Create React App's build tooling (`react-scripts`, a dev dependency). They don't ship to the browser; `npm audit --omit=dev` is clean.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This is a non-commercial portfolio project and isn't affiliated with Netflix. Film and TV data and images are provided by TMDB.
