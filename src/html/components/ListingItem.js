@@ -1,37 +1,51 @@
-import React, { useState, useEffect } from 'react'
-import lazySizes from "lazysizes";
-import gsap from "gsap"
-import {ScrollTrigger} from "gsap/ScrollTrigger"
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { tmdbImage } from "../../resources/js/TMDB/images";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
-function ListingItem(c) {
+function ListingItem({ title, image, href, number, featured = false, className = "" }) {
+    const mediaRef = useRef(null);
 
+    // One ScrollTrigger per item, attached to this item's own element and
+    // killed on unmount.
     useEffect(() => {
-		gsap.utils.toArray(".js-media-visibility").forEach((section) => {
-			ScrollTrigger.create({
-				toggleClass: "is-visible",
-				trigger: section,
-			})
-		})
-	}, [])
+        const trigger = ScrollTrigger.create({
+            trigger: mediaRef.current,
+            toggleClass: "is-visible",
+        });
+
+        return () => trigger.kill();
+    }, []);
+
     return (
-        <div className={`c-listing__item ${c.class ? c.class : "" }`}>
-            <a href="" className="c-listing__item-link">
+        <div className={`c-listing__item ${className}`}>
+            <a href={href} className="c-listing__item-link" target="_blank" rel="noopener noreferrer">
                 <div className="c-listing__item-media-container">
-                    {c.featured ?
-                    <img className="c-listing__item-number" src={`/resources/images/listing-featured-${c.number}.svg`} alt="" /> : ""
-                    }
-                    <div className="c-listing__item-media-container js-media-visibility">
+                    {featured && (
+                        <img
+                            className="c-listing__item-number"
+                            src={`/resources/images/listing-featured-${number}.svg`}
+                            alt=""
+                        />
+                    )}
+                    <div className="c-listing__item-media-container js-media-visibility" ref={mediaRef}>
                         <picture className="c-listing__item-media-wrapper">
-                            <img src={`https://image.tmdb.org/t/p/original/${c.image}`} className="c-listing__item-media lazyload" alt={c.title} />
+                            <img
+                                src={tmdbImage(image, featured ? "w342" : "w780")}
+                                className="c-listing__item-media"
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                            />
                         </picture>
                     </div>
                 </div>
-                <h2 className="c-listing__item-title">{c.title}</h2>
+                <h3 className="c-listing__item-title">{title}</h3>
             </a>
         </div>
-    )
+    );
 }
 
-export default ListingItem
+export default ListingItem;

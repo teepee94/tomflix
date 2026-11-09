@@ -1,17 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./resources/sass/site.scss"
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import "./resources/sass/site.scss";
 
-// Templates
 import TemplateHomepage from "./html/pages/templates/TemplateHomepage";
 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
-	<Router>
-		<Routes>
-			<Route exact path="/" element={<TemplateHomepage />} />
-		</Routes>
-	</Router>
+	<React.StrictMode>
+		<HelmetProvider>
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<TemplateHomepage />} />
+				</Routes>
+			</BrowserRouter>
+		</HelmetProvider>
+	</React.StrictMode>
 );
